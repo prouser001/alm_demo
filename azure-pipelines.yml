@@ -1,19 +1,35 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+- none
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
+- task: PowerPlatformToolInstaller@2
+  inputs:
+    DefaultVersion: true
+- task: PowerPlatformExportSolution@2
+  inputs:
+    authenticationType: 'PowerPlatformSPN'
+    PowerPlatformSPN: 'PRO-TC-PP_ALM-DEMO'
+    SolutionName: 'cargill_test_solution_v01'
+    SolutionOutputFile: '$(Build.ArtifactStagingDirectory)\$(SolutionName).zip' 
+    AsyncOperation: true
+    MaxAsyncWaitTime: '60'
+- task: PowerPlatformUnpackSolution@2
+  inputs:
+    SolutionInputFile: '$(Build.ArtifactStagingDirectory)\$(SolutionName).zip'
+    SolutionTargetFolder: '$(Build.SourcesDirectory)\$(SolutionName)'
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    echo "commit all changes"
+    git config user.email "powerappsTools@protiviti.net"
+    git config user.name "PowerPlatformBuildTools"
+    git checkout main
+    git pull
+    git add .
+    git commit -m "$(SolutionName) Exported"
+    
+    echo "push code to new repo"
+    git -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" push origin HEAD:main
+   
+  displayName: 'Git Commit Solution to Repo'
