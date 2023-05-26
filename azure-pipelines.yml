@@ -20,16 +20,18 @@ steps:
   inputs:
     SolutionInputFile: '$(Build.ArtifactStagingDirectory)\$(SolutionName).zip'
     SolutionTargetFolder: '$(Build.SourcesDirectory)\$(SolutionName)'
-- script: |
-    echo "commit all changes"
-    git config user.email "powerappsTools@protiviti.net"
-    git config user.name "PowerPlatformBuildTools"
-    git checkout main
-    git pull
-    git add .
-    git commit -m "$(SolutionName) Exported"
+- task: CmdLine@2
+  inputs:
+    script: |
+      echo "commit all changes"
+      git config user.email "powerappsTools@protiviti.net"
+      git config user.name "PowerPlatformBuildTools"
+      git checkout main
+      git pull
+      git add .
+      git commit -m "$(SolutionName) Exported"
+      
+      echo "push code to new repo"
+      git -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" push origin HEAD:main
     
-    echo "push code to new repo"
-    git -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" push origin HEAD:main
-   
-  displayName: 'Git Commit Solution to Repo'
+    displayName: 'Git Commit Solution to Repo'
