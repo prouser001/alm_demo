@@ -21,6 +21,7 @@ steps:
     SolutionInputFile: '$(Build.ArtifactStagingDirectory)\$(SolutionName).zip'
     SolutionTargetFolder: '$(Build.SourcesDirectory)\$(SolutionName)'
 - task: CmdLine@2
+  displayName: 'Git Commit Solution to Repo'
   inputs:
     script: |
       echo "commit all changes"
@@ -33,5 +34,3 @@ steps:
       
       echo "push code to new repo"
       git -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" push origin HEAD:main
-    
-    displayName: 'Git Commit Solution to Repo'
