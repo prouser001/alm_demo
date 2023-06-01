@@ -25,8 +25,8 @@ steps:
   inputs:
     script: |
       echo "commit all changes"
-      git config user.email "powerappsTools@protiviti.net"
-      git config user.name "PowerPlatformBuildTools"
+      git config user.email "wwtarleton@gmail.com"
+      git config user.name "prouser001"
       git checkout main
       git pull
       git add .
